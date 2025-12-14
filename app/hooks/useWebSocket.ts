@@ -107,7 +107,7 @@ export function useWebSocket(): UseWebSocketReturn {
    */
   useEffect(() => {
     // Criar conexão WebSocket
-    const socket = io('http://localhost:5000', {
+    const socket = io('https://8e05f22c6c0f.ngrok-free.app/', {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
