@@ -57,7 +57,6 @@ interface UseWebSocketReturn {
   socket: Socket | null;
   isConnected: boolean;
   sendMove: (direction: { dx: number; dy: number }) => void;
-  startGame: () => void;
   playerId: string | null;
 }
 
@@ -86,15 +85,6 @@ export function useWebSocket(): UseWebSocketReturn {
     },
     [isConnected]
   );
-
-  /**
-   * Envia comando para iniciar o jogo
-   */
-  const startGame = useCallback(() => {
-    if (socketRef.current && isConnected) {
-      socketRef.current.emit('startGame');
-    }
-  }, [isConnected]);
 
   /**
    * Efeito: Inicializar conexão WebSocket
@@ -139,16 +129,11 @@ export function useWebSocket(): UseWebSocketReturn {
      *
      * O servidor envia o estado completo após cada tick
      * Padrão: State Synchronization
+     * Sincroniza todos os clientes através deste evento
      */
     socket.on('gameState', (state: GameState) => {
+      console.log('📡 gameState recebido:', state);
       setGameState(state);
-    });
-
-    /**
-     * Listener: Jogo iniciado
-     */
-    socket.on('gameStarted', () => {
-      // Evento de confirmação
     });
 
     /**
@@ -179,7 +164,6 @@ export function useWebSocket(): UseWebSocketReturn {
     socket: socketRef.current,
     isConnected,
     sendMove,
-    startGame,
     playerId,
   };
 }

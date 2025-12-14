@@ -39,14 +39,22 @@ export default function Game() {
 
   /**
    * Efeito: Alternar entre Lobby e Game baseado no status
+   * gameState pode estar null inicialmente, então verifica explicitamente
    */
   useEffect(() => {
-    if (gameState?.status === 'playing') {
+    console.log('🎮 gameState atualizado:', gameState);
+    if (gameState && gameState.status === 'playing') {
+      console.log('✅ Status é PLAYING, mostrando jogo');
       setShowGame(true);
-    } else if (gameState?.status === 'lobby') {
+    } else if (gameState && gameState.status === 'lobby') {
+      console.log('📍 Status é LOBBY, mostrando lobby');
+      setShowGame(false);
+    } else if (gameState === null) {
+      // Ainda carregando, mantém no lobby
+      console.log('⏳ gameState é null, carregando...');
       setShowGame(false);
     }
-  }, [gameState?.status]);
+  }, [gameState?.status, gameState]);
 
   /**
    * Efeito: Capturar eventos de teclado
@@ -140,9 +148,10 @@ export default function Game() {
 
   /**
    * UI: Mostrar Lobby ou Jogo
+   * Baseado apenas no gameState?.status para sincronizar todos os clientes
    */
   if (!showGame) {
-    return <Lobby socket={socket} onGameStart={() => setShowGame(true)} />;
+    return <Lobby socket={socket} />;
   }
 
   /**

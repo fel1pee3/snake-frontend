@@ -5,7 +5,6 @@ import { Socket } from 'socket.io-client';
 
 interface LobbyProps {
   socket: Socket | null;
-  onGameStart: () => void;
 }
 
 interface LobbyStatus {
@@ -14,13 +13,12 @@ interface LobbyStatus {
   players: string[];
 }
 
-export default function Lobby({ socket, onGameStart }: LobbyProps) {
+export default function Lobby({ socket }: LobbyProps) {
   const [lobbyStatus, setLobbyStatus] = useState<LobbyStatus>({
     status: 'lobby',
     playerCount: 0,
     players: [],
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [showFruitInfo, setShowFruitInfo] = useState(false);
 
   useEffect(() => {
@@ -38,16 +36,7 @@ export default function Lobby({ socket, onGameStart }: LobbyProps) {
   }, [socket]);
 
   const handleStartGame = () => {
-    setIsLoading(true);
-    socket?.emit('startGame');
-
-    const handleGameStarted = () => {
-      setIsLoading(false);
-      onGameStart();
-      socket?.off('gameStarted', handleGameStarted);
-    };
-
-    socket?.on('gameStarted', handleGameStarted);
+    // Jogo começa automaticamente, este método não é mais usado
   };
 
   return (
@@ -61,31 +50,25 @@ export default function Lobby({ socket, onGameStart }: LobbyProps) {
         <div className="bg-slate-700 rounded-lg p-6 mb-8 border border-cyan-500">
           <h2 className="text-cyan-400 font-bold mb-4 flex items-center gap-2">
             <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-            Jogadores
+            Jogadores Online
           </h2>
           
           <div className="text-3xl font-bold text-cyan-300 text-center mb-2">
             {lobbyStatus.playerCount}
           </div>
           
-          <p className="text-gray-400 text-center text-sm">
+          <p className="text-gray-400 text-center text-sm mb-4">
             {lobbyStatus.playerCount === 1
-              ? 'Você está aqui'
-              : `${lobbyStatus.playerCount} no lobby`}
+              ? 'Você está sozinho'
+              : `${lobbyStatus.playerCount} jogadores online`}
           </p>
-        </div>
 
-        <button
-          onClick={handleStartGame}
-          disabled={isLoading}
-          className={`w-full py-4 px-6 rounded-lg font-bold text-lg transition-all mb-3 ${
-            isLoading
-              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-cyan-500 text-white hover:bg-cyan-400 active:scale-95'
-          }`}
-        >
-          {isLoading ? '⚙️ Iniciando...' : '🎮 Iniciar Jogo'}
-        </button>
+          <div className="bg-slate-600 rounded p-3 border border-cyan-400">
+            <p className="text-cyan-300 text-center font-semibold animate-pulse">
+              ✓ Jogo iniciando...
+            </p>
+          </div>
+        </div>
 
         <button
           onClick={() => setShowFruitInfo(true)}
