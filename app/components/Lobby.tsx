@@ -5,6 +5,7 @@ import { Socket } from 'socket.io-client';
 
 interface LobbyProps {
   socket: Socket | null;
+  onGameStart: () => void;
 }
 
 interface LobbyStatus {
@@ -13,12 +14,13 @@ interface LobbyStatus {
   players: string[];
 }
 
-export default function Lobby({ socket }: LobbyProps) {
+export default function Lobby({ socket, onGameStart }: LobbyProps) {
   const [lobbyStatus, setLobbyStatus] = useState<LobbyStatus>({
     status: 'lobby',
     playerCount: 0,
     players: [],
   });
+  const [isLoading, setIsLoading] = useState(false);
   const [showFruitInfo, setShowFruitInfo] = useState(false);
 
   useEffect(() => {
@@ -36,7 +38,9 @@ export default function Lobby({ socket }: LobbyProps) {
   }, [socket]);
 
   const handleStartGame = () => {
-    // Jogo começa automaticamente, este método não é mais usado
+    setIsLoading(true);
+    socket?.emit('startGame');
+    onGameStart();
   };
 
   return (
@@ -57,18 +61,24 @@ export default function Lobby({ socket }: LobbyProps) {
             {lobbyStatus.playerCount}
           </div>
           
-          <p className="text-gray-400 text-center text-sm mb-4">
+          <p className="text-gray-400 text-center text-sm">
             {lobbyStatus.playerCount === 1
               ? 'Você está sozinho'
               : `${lobbyStatus.playerCount} jogadores online`}
           </p>
-
-          <div className="bg-slate-600 rounded p-3 border border-cyan-400">
-            <p className="text-cyan-300 text-center font-semibold animate-pulse">
-              ✓ Jogo iniciando...
-            </p>
-          </div>
         </div>
+
+        <button
+          onClick={handleStartGame}
+          disabled={isLoading}
+          className={`w-full py-4 px-6 rounded-lg font-bold text-lg transition-all mb-3 ${
+            isLoading
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-cyan-500 text-white hover:bg-cyan-400 active:scale-95'
+          }`}
+        >
+          {isLoading ? '⚙️ Iniciando...' : '🎮 Iniciar Jogo'}
+        </button>
 
         <button
           onClick={() => setShowFruitInfo(true)}

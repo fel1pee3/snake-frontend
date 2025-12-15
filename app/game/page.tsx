@@ -42,16 +42,12 @@ export default function Game() {
    * gameState pode estar null inicialmente, então verifica explicitamente
    */
   useEffect(() => {
-    console.log('🎮 gameState atualizado:', gameState);
     if (gameState && gameState.status === 'playing') {
-      console.log('✅ Status é PLAYING, mostrando jogo');
       setShowGame(true);
     } else if (gameState && gameState.status === 'lobby') {
-      console.log('📍 Status é LOBBY, mostrando lobby');
       setShowGame(false);
     } else if (gameState === null) {
       // Ainda carregando, mantém no lobby
-      console.log('⏳ gameState é null, carregando...');
       setShowGame(false);
     }
   }, [gameState?.status, gameState]);
